@@ -1,5 +1,10 @@
 getaws()
 {
   unset AWS_PROFILE AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
-  eval $(AWS_PROFILE=$1 ~/.oh-my-zsh/custom/plugins/aws-mfa/get-aws-creds)
+  if [[ $1 =~ [0-9]{6} ]]
+  then 
+    eval $(AWS_MFA_CODE=$1 ~/.oh-my-zsh/custom/plugins/aws-mfa/get-aws-creds)
+  else
+    eval $(AWS_PROFILE=$1 AWS_MFA_CODE=$2 ~/.oh-my-zsh/custom/plugins/aws-mfa/get-aws-creds)
+  fi
 }

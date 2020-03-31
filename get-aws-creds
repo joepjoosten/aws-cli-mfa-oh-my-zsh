@@ -49,9 +49,13 @@ $mfa" >&2
 fi
 
 echo Your MFA device is: $device >&2
-
-echo -n "Enter your MFA code now: " >&2
-read code
+if [ -z "$AWS_MFA_CODE" ]
+then
+  echo -n "Enter your MFA code now: " >&2
+  read code
+else
+  code=$AWS_MFA_CODE
+fi
 
 tokens=$(aws sts get-session-token --serial-number "$device" --token-code $code)
 
