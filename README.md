@@ -3,6 +3,12 @@ oh-my-zsh plugin for AWS CLI MFA
 based on [https://github.com/sweharris/aws-cli-mfa](https://github.com/sweharris/aws-cli-mfa)
 support for passing totp as an argument added by [kt-caylent](https://github.com/kt-caylent)
 
+## Using settings from .aws/config
+Now also supports "mfa_device" that is specified in profile (even with "source_profile").
+
+When "role_arn" is specified, it will assume the role after successful mfa login, and set the credentials for that assumed role
+
+
 ## Install Oh-My-Zsh AWS MFA Plugin
 1) ```git clone --depth=1 https://github.com/joepjoosten/aws-cli-mfa-oh-my-zsh.git "$ZSH/custom/plugins/aws-mfa"```
 2) enable it in plugins=(... aws-mfa) in your zshrc file
