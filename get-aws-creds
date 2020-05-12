@@ -16,9 +16,11 @@ if [ -n "$config_source_profile" ]
 then
   config_aws_access_key_id=$(aws configure get aws_access_key_id --profile $config_source_profile)
   config_aws_secret_access_key=$(aws configure get aws_secret_access_key --profile $config_source_profile)
+  config_region=$(aws configure get region --profile $config_source_profile)
 else
   config_aws_access_key_id=$(aws configure get aws_access_key_id)
   config_aws_secret_access_key=$(aws configure get aws_secret_access_key)
+  config_region=$(aws configure get region)
 fi
 config_mfa_device=$(aws configure get mfa_serial)
 config_role_arn=$(aws configure get role_arn)
@@ -93,6 +95,11 @@ $tokens" >&2
   exit 255
 fi
 
+if [ -n "$config_region" ]
+then
+  echo export AWS_DEFAULT_REGION=$config_region
+fi
+
 if [ -z "$config_role_arn" ]
 then
   echo export AWS_SESSION_TOKEN=$session
@@ -105,7 +112,7 @@ else
   
   echo Assuming role: $config_role_arn >&2
 
-  tokens=$(aws sts assume-role  --role-arn $config_role_arn  --role-session-name get-aws-creds)
+  tokens=$(aws sts assume-role --role-arn $config_role_arn --role-session-name get-aws-creds --duration-seconds 3600)
 
   secret=$(echo -- "$tokens" | sed -n 's!.*"SecretAccessKey": "\(.*\)".*!\1!p')
   session=$(echo -- "$tokens" | sed -n 's!.*"SessionToken": "\(.*\)".*!\1!p')
