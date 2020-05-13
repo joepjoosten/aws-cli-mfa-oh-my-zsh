@@ -16,12 +16,11 @@ if [ -n "$config_source_profile" ]
 then
   config_aws_access_key_id=$(aws configure get aws_access_key_id --profile $config_source_profile)
   config_aws_secret_access_key=$(aws configure get aws_secret_access_key --profile $config_source_profile)
-  config_region=$(aws configure get region --profile $config_source_profile)
 else
   config_aws_access_key_id=$(aws configure get aws_access_key_id)
   config_aws_secret_access_key=$(aws configure get aws_secret_access_key)
-  config_region=$(aws configure get region)
 fi
+config_region=$(aws configure get region)
 config_mfa_device=$(aws configure get mfa_serial)
 config_role_arn=$(aws configure get role_arn)
 
@@ -98,6 +97,7 @@ fi
 if [ -n "$config_region" ]
 then
   echo export AWS_DEFAULT_REGION=$config_region
+  aws configure set region $config_region --profile current_session
 fi
 
 if [ -z "$config_role_arn" ]
@@ -105,6 +105,9 @@ then
   echo export AWS_SESSION_TOKEN=$session
   echo export AWS_SECRET_ACCESS_KEY=$secret
   echo export AWS_ACCESS_KEY_ID=$access
+  aws configure set aws_access_key_id $access --profile current_session
+  aws configure set aws_secret_access_key $secret --profile current_session
+  aws configure set aws_session_token $session --profile current_session
 else
   export AWS_SESSION_TOKEN=$session
   export AWS_SECRET_ACCESS_KEY=$secret
@@ -122,6 +125,10 @@ else
   echo export AWS_SESSION_TOKEN=$session
   echo export AWS_SECRET_ACCESS_KEY=$secret
   echo export AWS_ACCESS_KEY_ID=$access
+
+  aws configure set aws_access_key_id $access --profile current_session
+  aws configure set aws_secret_access_key $secret --profile current_session
+  aws configure set aws_session_token $session --profile current_session
 fi
 
 echo Keys valid until $expire >&2
