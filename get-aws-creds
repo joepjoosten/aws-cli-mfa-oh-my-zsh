@@ -94,10 +94,17 @@ $tokens" >&2
   exit 255
 fi
 
+if [ -z "$DESTINATION_PROFILE" ]
+then
+  destination_profile="current_session"
+else
+  destination_profile=$DESTINATION_PROFILE
+fi
+
 if [ -n "$config_region" ]
 then
   echo export AWS_DEFAULT_REGION=$config_region
-  aws configure set region $config_region --profile current_session
+  aws configure set region $config_region --profile $destination_profile
 fi
 
 if [ -z "$config_role_arn" ]
@@ -105,9 +112,9 @@ then
   echo export AWS_SESSION_TOKEN=$session
   echo export AWS_SECRET_ACCESS_KEY=$secret
   echo export AWS_ACCESS_KEY_ID=$access
-  aws configure set aws_access_key_id $access --profile current_session
-  aws configure set aws_secret_access_key $secret --profile current_session
-  aws configure set aws_session_token $session --profile current_session
+  aws configure set aws_access_key_id $access --profile $destination_profile
+  aws configure set aws_secret_access_key $secret --profile $destination_profile
+  aws configure set aws_session_token $session --profile $destination_profile
 else
   export AWS_SESSION_TOKEN=$session
   export AWS_SECRET_ACCESS_KEY=$secret
@@ -126,9 +133,9 @@ else
   echo export AWS_SECRET_ACCESS_KEY=$secret
   echo export AWS_ACCESS_KEY_ID=$access
 
-  aws configure set aws_access_key_id $access --profile current_session
-  aws configure set aws_secret_access_key $secret --profile current_session
-  aws configure set aws_session_token $session --profile current_session
+  aws configure set aws_access_key_id $access --profile $destination_profile
+  aws configure set aws_secret_access_key $secret --profile $destination_profile
+  aws configure set aws_session_token $session --profile $destination_profile
 fi
 
 echo Keys valid until $expire >&2
