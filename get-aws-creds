@@ -23,6 +23,7 @@ fi
 config_region=$(aws configure get region)
 config_mfa_device=$(aws configure get mfa_serial)
 config_role_arn=$(aws configure get role_arn)
+config_duration_seconds=$(aws configure get duration_seconds)
 
 unset AWS_PROFILE
 export AWS_SECRET_ACCESS_KEY=$config_aws_secret_access_key 
@@ -122,7 +123,12 @@ else
   
   echo Assuming role: $config_role_arn >&2
 
-  tokens=$(aws sts assume-role --role-arn $config_role_arn --role-session-name get-aws-creds --duration-seconds 3600)
+if [ -z "$config_duration_seconds" ]
+then
+  config_duration_seconds=3600
+fi
+
+  tokens=$(aws sts assume-role --role-arn $config_role_arn --role-session-name get-aws-creds --duration-seconds $config_duration_seconds)
 
   secret=$(echo -- "$tokens" | sed -n 's!.*"SecretAccessKey": "\(.*\)".*!\1!p')
   session=$(echo -- "$tokens" | sed -n 's!.*"SessionToken": "\(.*\)".*!\1!p')
