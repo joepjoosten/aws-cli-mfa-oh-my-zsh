@@ -25,6 +25,11 @@ config_mfa_device=$(aws configure get mfa_serial)
 config_role_arn=$(aws configure get role_arn)
 config_duration_seconds=$(aws configure get duration_seconds)
 
+if [ -z "$config_duration_seconds" ]
+then
+  config_duration_seconds=43200
+fi
+
 unset AWS_PROFILE
 export AWS_SECRET_ACCESS_KEY=$config_aws_secret_access_key 
 export AWS_ACCESS_KEY_ID=$config_aws_access_key_id 
@@ -80,7 +85,7 @@ else
   code=$AWS_MFA_CODE
 fi
 
-tokens=$(aws sts get-session-token --serial-number "$device" --token-code $code)
+tokens=$(aws sts get-session-token --serial-number "$device" --token-code $code --duration-seconds 3600)
 
 secret=$(echo -- "$tokens" | sed -n 's!.*"SecretAccessKey": "\(.*\)".*!\1!p')
 session=$(echo -- "$tokens" | sed -n 's!.*"SessionToken": "\(.*\)".*!\1!p')
@@ -122,11 +127,6 @@ else
   export AWS_ACCESS_KEY_ID=$access
   
   echo Assuming role: $config_role_arn >&2
-
-if [ -z "$config_duration_seconds" ]
-then
-  config_duration_seconds=3600
-fi
 
   tokens=$(aws sts assume-role --role-arn $config_role_arn --role-session-name get-aws-creds --duration-seconds $config_duration_seconds)
 
