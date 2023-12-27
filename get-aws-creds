@@ -85,7 +85,7 @@ else
   code=$AWS_MFA_CODE
 fi
 
-tokens=$(aws sts get-session-token --serial-number "$device" --token-code $code --duration-seconds 3600)
+tokens=$(aws sts get-session-token --serial-number "$device" --token-code $code --duration-seconds $config_duration_seconds)
 
 secret=$(echo -- "$tokens" | sed -n 's!.*"SecretAccessKey": "\(.*\)".*!\1!p')
 session=$(echo -- "$tokens" | sed -n 's!.*"SessionToken": "\(.*\)".*!\1!p')
